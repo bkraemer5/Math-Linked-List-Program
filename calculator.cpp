@@ -29,19 +29,14 @@ int main() {
 
   char character;
   left = loadNumber(inFile);
-  while (left){
+  while (left) {
     right = loadNumber(inFile);
     op = getOperator(inFile);
-    printNum(left);
-    printNum(right);
-    cout << op << endl;
     if (op == '+') {
       result = addNumbers(left, right);
-      printNum(result);
     }
     else {
       result = subNumbers(left, right);
-      printNum(result);
     }
     writeNumber(result, outFile);
     left = loadNumber(inFile);
@@ -105,15 +100,17 @@ char getOperator(ifstream & file){
   return oline[0]; 
 }
 
+// prints the number as output
 void printNum(digit * num){
   digit *temp = num;
   while(temp != nullptr) {
-    cout << temp->data; // << " ";
+    cout << temp->data;
     temp = temp->next;
   }
   cout << endl;
 }
 
+// writes the number in a file
 void writeNumber(digit * num, ofstream & file){
   digit *temp = num;
   while(temp != nullptr) {
@@ -123,10 +120,7 @@ void writeNumber(digit * num, ofstream & file){
   file << endl;
 }
 
-void deleteNumber(digit * num){
-    return;
-}
-
+// adds two linked lists and returns the result in a separate linked list
 digit * addNumbers(digit * left, digit * right) {
   digit *temp1 = left;
   digit *temp2 = right;
@@ -136,15 +130,17 @@ digit * addNumbers(digit * left, digit * right) {
   while(temp1 != nullptr) {
     sum = temp1->data + temp2->data + carry;
     if (sum < 10) {
+      // no carry over
       carry = 0;
-      newList = new digit{sum, newList};
     }
     else {
+      // with carry over
       sum = sum%10;
       carry = 1;
-      newList = new digit{sum, newList};
     }
+    newList = new digit {sum, newList};
     if (temp1->next == nullptr && carry == 1) {
+      // adds an extra digit at the beginning of the list for carry over
       newList = new digit{carry, newList};
     }
     temp1 = temp1->next;
@@ -154,11 +150,13 @@ digit * addNumbers(digit * left, digit * right) {
   delete newList, temp1, temp2;
 }
 
+// a helper function for dealing with carry digits in subtraction
 void subCarry(digit * head, digit * prev){
     head->data = head->data + 10;
     prev->data = prev->data - 1;
 }
 
+// subtracts two linked lists and returns their result in a separate linked list
 digit * subNumbers(digit * left, digit * right){
     bool negative = false;
     digit *newList = nullptr;
@@ -166,6 +164,7 @@ digit * subNumbers(digit * left, digit * right){
     digit *temp2 = right;
     digit *prev = temp1->next;
     if (digcmp(left, right) == -1) {
+      // deals with subtraction resulting in negative
       temp1 = right;
       temp2 = left;
       negative = true;
@@ -174,16 +173,19 @@ digit * subNumbers(digit * left, digit * right){
     while(temp1 != nullptr) {
       subtract = temp1->data - temp2->data;
       if (subtract < 0 && prev != nullptr) {
-          subCarry(temp1, prev);
-          subtract = temp1->data - temp2->data;
+        // if right digit > left digit, carry over & perform subtraction again 
+        subCarry(temp1, prev);
+        subtract = temp1->data - temp2->data;
       }
       if (negative == true && temp1->next == nullptr) {
+        // the first digit becomes negative when subtraction results in a negative number
         subtract = -subtract;
       }
       newList = new digit{subtract, newList};
       temp1 = temp1->next;
       temp2 = temp2->next;
       if (prev != nullptr){
+        // ensures prev doesnt go out of bounds
         prev = prev->next;
       }
     }
